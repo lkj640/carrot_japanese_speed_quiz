@@ -1,0 +1,698 @@
+<title>日本語スピードクイズ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap">
+<style>
+  :root{
+    --bg:#FFF6EC;
+    --bg-dot: rgba(255,122,46,0.10);
+    --surface:#FFFFFF;
+    --surface-soft:#FFEEDD;
+    --ink:#2B1F16;
+    --ink-muted:#8A7566;
+    --accent:#FF7A2E;
+    --accent-strong:#E85A18;
+    --accent-soft:#FFDAB8;
+    --green:#4F9A6E;
+    --line:#F0D9BF;
+    --shadow: 43,31,22;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1C140D;
+      --bg-dot: rgba(255,138,61,0.14);
+      --surface:#2A1F16;
+      --surface-soft:#3A2A1B;
+      --ink:#FBEEE0;
+      --ink-muted:#C9AF95;
+      --accent:#FF8A3D;
+      --accent-strong:#FFA562;
+      --accent-soft:#4A2E17;
+      --green:#6FBE8F;
+      --line:#4A3624;
+      --shadow: 0,0,0;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1C140D;
+    --bg-dot: rgba(255,138,61,0.14);
+    --surface:#2A1F16;
+    --surface-soft:#3A2A1B;
+    --ink:#FBEEE0;
+    --ink-muted:#C9AF95;
+    --accent:#FF8A3D;
+    --accent-strong:#FFA562;
+    --accent-soft:#4A2E17;
+    --green:#6FBE8F;
+    --line:#4A3624;
+    --shadow: 0,0,0;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 1px 1px, var(--bg-dot) 1.5px, transparent 1.5px) 0 0/22px 22px,
+      var(--bg);
+    color:var(--ink);
+    font-family:'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Hiragino Sans', sans-serif;
+    display:flex;
+    justify-content:center;
+    padding: 28px 16px;
+    padding-block: 28px;
+  }
+  h1,h2,h3{ text-wrap:balance; margin:0; }
+  button{ font-family:inherit; }
+
+  .app{
+    width:100%;
+    max-width:440px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+
+  /* ---------- shared bits ---------- */
+  .pin{
+    align-self:flex-start;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--surface-soft);
+    color:var(--accent-strong);
+    border:1px solid var(--line);
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:0.82rem;
+    font-weight:400;
+  }
+  .btn{
+    border:none;
+    border-radius:999px;
+    padding:16px 20px;
+    font-size:1.05rem;
+    font-weight:400;
+    cursor:pointer;
+    transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+  }
+  .btn:active{ transform: scale(0.97); }
+  .btn-primary{
+    background:var(--accent);
+    color:#fff9f4;
+    box-shadow: 0 10px 24px -10px rgba(var(--shadow),0.55);
+  }
+  .btn-primary:hover{ background:var(--accent-strong); }
+  .btn-ghost{
+    background:var(--surface-soft);
+    color:var(--ink);
+    border:1px solid var(--line);
+  }
+  .btn-quit{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--ink-muted);
+    border-radius:999px;
+    padding:8px 14px;
+    font-size:0.85rem;
+    cursor:pointer;
+  }
+  [hidden]{ display:none !important; }
+  :focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
+
+  /* ---------- start screen ---------- */
+  .hero{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:28px;
+    padding:26px 22px 22px;
+    box-shadow: 0 18px 40px -24px rgba(var(--shadow),0.5);
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .hero h1{
+    font-size:clamp(1.7rem, 7vw, 2.2rem);
+    line-height:1.25;
+  }
+  .hero p{
+    margin:0;
+    color:var(--ink-muted);
+    line-height:1.65;
+    font-size:0.96rem;
+  }
+  .rules{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    background:var(--surface-soft);
+    border-radius:18px;
+    padding:14px 16px;
+  }
+  .rules div{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    font-size:0.92rem;
+    line-height:1.5;
+  }
+  .rules b{ color:var(--accent-strong); flex:0 0 auto; }
+
+  .section-label{
+    font-size:0.85rem;
+    color:var(--ink-muted);
+    letter-spacing:0.02em;
+    margin: 2px 2px 0;
+  }
+  .chip-grid{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap:10px;
+  }
+  .chip{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--surface);
+    border:1.5px solid var(--line);
+    color:var(--ink);
+    border-radius:16px;
+    padding:12px 12px;
+    font-size:0.95rem;
+    cursor:pointer;
+    text-align:left;
+  }
+  .chip .count{
+    margin-left:auto;
+    font-size:0.75rem;
+    color:var(--ink-muted);
+  }
+  .chip[aria-pressed="true"]{
+    background:var(--accent-soft);
+    border-color:var(--accent);
+    color:var(--accent-strong);
+  }
+  .chip[aria-pressed="true"] .count{ color:var(--accent-strong); }
+
+  /* ---------- game screen ---------- */
+  .game{ display:flex; flex-direction:column; gap:16px; }
+  .game-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .timer{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 16px;
+    box-shadow: 0 10px 22px -16px rgba(var(--shadow),0.5);
+  }
+  .timer .dot{
+    width:9px; height:9px; border-radius:50%;
+    background:var(--accent);
+    animation: pulse 1s infinite ease-in-out;
+  }
+  @media (prefers-reduced-motion: reduce){ .timer .dot{ animation:none; } }
+  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.35; } }
+  .timer span{
+    font-variant-numeric: tabular-nums;
+    font-size:1.3rem;
+    font-weight:400;
+    min-width:4.4ch;
+  }
+
+  .progress{
+    display:flex;
+    gap:6px;
+    justify-content:center;
+  }
+  .progress i{
+    width:18px; height:6px;
+    border-radius:4px;
+    background:var(--line);
+  }
+  .progress i.done{ background:var(--accent); }
+  .progress i.current{ background:var(--accent-soft); border:1.5px solid var(--accent); height:5px; }
+
+  .stage{
+    position:relative;
+    height: min(52vh, 420px);
+  }
+  .card{
+    position:absolute;
+    inset:0;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:28px;
+    box-shadow: 0 24px 50px -22px rgba(var(--shadow),0.55);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    padding:28px 22px;
+    text-align:center;
+    cursor:pointer;
+    user-select:none;
+    transition: transform .22s cubic-bezier(.32,.9,.4,1.1), opacity .18s ease;
+  }
+  .card.leaving{
+    transform: translateX(-30px) rotate(-3deg) scale(0.96);
+    opacity:0;
+  }
+  .card.entering{
+    animation: cardIn .28s cubic-bezier(.2,.8,.3,1);
+  }
+  @keyframes cardIn{
+    from{ transform: translateX(24px) rotate(2deg) scale(0.97); opacity:0; }
+    to{ transform:none; opacity:1; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .card, .card.entering{ animation:none; transition:none; }
+  }
+  .card .cat-tag{
+    position:absolute;
+    top:16px; left:16px;
+    background:var(--surface-soft);
+    color:var(--ink-muted);
+    font-size:0.72rem;
+    padding:5px 10px;
+    border-radius:999px;
+  }
+  .card .word{
+    font-size:clamp(2.1rem, 11vw, 3.6rem);
+    font-weight:700;
+    line-height:1.15;
+  }
+  .card .reading{
+    font-size:1.05rem;
+    color:var(--ink-muted);
+    font-weight:500;
+  }
+  .card .tap-hint{
+    position:absolute;
+    bottom:14px;
+    font-size:0.78rem;
+    color:var(--ink-muted);
+  }
+
+  .game-bottom{
+    display:flex;
+    justify-content:center;
+  }
+
+  /* ---------- result screen ---------- */
+  .result{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:28px;
+    padding:30px 24px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    box-shadow: 0 18px 40px -24px rgba(var(--shadow),0.5);
+  }
+  .result .badge{
+    font-size:0.85rem;
+    color:var(--accent-strong);
+    background:var(--accent-soft);
+    padding:6px 14px;
+    border-radius:999px;
+  }
+  .result .time{
+    font-size:clamp(2.4rem,12vw,3.4rem);
+    font-variant-numeric: tabular-nums;
+    font-weight:400;
+    margin:6px 0 0;
+  }
+  .result .best{
+    font-size:0.92rem;
+    color:var(--ink-muted);
+  }
+  .result .best b{ color:var(--green); }
+  .result-actions{
+    display:flex;
+    gap:10px;
+    width:100%;
+    margin-top:8px;
+  }
+  .result-actions .btn{ flex:1; }
+
+  footer{
+    text-align:center;
+    font-size:0.78rem;
+    color:var(--ink-muted);
+    padding-top:4px;
+  }
+</style>
+
+<div class="app">
+
+  <!-- ============ START SCREEN ============ -->
+  <section id="screen-start">
+    <div class="pin">📍 ご近所交流会 · 早押し単語ゲーム</div>
+    <div class="hero" style="margin-top:12px;">
+      <h1>日本語スピードクイズ</h1>
+      <p>一人がカードに出た単語を<b>ジェスチャーや説明</b>で伝え、残りのみんなが当てるゲームです。10問終えるまでのタイムを計ります。</p>
+      <div class="rules">
+        <div><b>1.</b> カテゴリーを選んでスタートすると、すぐタイマーが動き出します。</div>
+        <div><b>2.</b> 説明する人だけ画面を見て、単語と読み方を頼りに伝えます。</div>
+        <div><b>3.</b> 正解したらカードをタップ!すぐ次の単語に切り替わります。</div>
+        <div><b>4.</b> 10問終えるとタイマーが止まり、記録が出ます。</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">カテゴリーを選ぶ</div>
+      <div class="chip-grid" id="category-grid" role="group" aria-label="カテゴリー選択"></div>
+    </div>
+
+    <button class="btn btn-primary" id="btn-start">タイマー開始してスタート →</button>
+    <footer>友達と画面をまわしながら楽しもう 🥕</footer>
+  </section>
+
+  <!-- ============ GAME SCREEN ============ -->
+  <section id="screen-game" hidden>
+    <div class="game">
+      <div class="game-top">
+        <button class="btn-quit" id="btn-quit">← やめる</button>
+        <div class="timer"><span class="dot" aria-hidden="true"></span><span id="timer-display">0:00.0</span></div>
+      </div>
+      <div class="progress" id="progress-dots"></div>
+      <div class="stage" id="stage">
+        <!-- card injected here -->
+      </div>
+      <div class="game-bottom">
+        <span style="font-size:0.85rem;color:var(--ink-muted);" id="turn-label">1問目 / 全10問</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESULT SCREEN ============ -->
+  <section id="screen-result" hidden>
+    <div class="result">
+      <div class="badge" id="result-category">すべて</div>
+      <h2>🎉 10問クリア!</h2>
+      <div class="time" id="result-time">0:00.0</div>
+      <div class="best" id="result-best"></div>
+      <div class="result-actions">
+        <button class="btn btn-ghost" id="btn-change-category">カテゴリーを変える</button>
+        <button class="btn btn-primary" id="btn-retry">同じカテゴリーでもう一度</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var WORDS = [
+    // animal
+    {cat:"animal", jp:"犬", reading:"いぬ"},
+    {cat:"animal", jp:"猫", reading:"ねこ"},
+    {cat:"animal", jp:"鳥", reading:"とり"},
+    {cat:"animal", jp:"魚", reading:"さかな"},
+    {cat:"animal", jp:"うさぎ", reading:"うさぎ"},
+    {cat:"animal", jp:"象", reading:"ぞう"},
+    {cat:"animal", jp:"ライオン", reading:"らいおん"},
+    {cat:"animal", jp:"パンダ", reading:"ぱんだ"},
+    {cat:"animal", jp:"亀", reading:"かめ"},
+    {cat:"animal", jp:"蛇", reading:"へび"},
+    {cat:"animal", jp:"猿", reading:"さる"},
+    {cat:"animal", jp:"熊", reading:"くま"},
+    {cat:"animal", jp:"馬", reading:"うま"},
+    {cat:"animal", jp:"羊", reading:"ひつじ"},
+    {cat:"animal", jp:"キリン", reading:"きりん"},
+    // food
+    {cat:"food", jp:"寿司", reading:"すし"},
+    {cat:"food", jp:"ラーメン", reading:"らーめん"},
+    {cat:"food", jp:"カレー", reading:"かれー"},
+    {cat:"food", jp:"天ぷら", reading:"てんぷら"},
+    {cat:"food", jp:"焼き鳥", reading:"やきとり"},
+    {cat:"food", jp:"お好み焼き", reading:"おこのみやき"},
+    {cat:"food", jp:"うどん", reading:"うどん"},
+    {cat:"food", jp:"そば", reading:"そば"},
+    {cat:"food", jp:"餃子", reading:"ぎょうざ"},
+    {cat:"food", jp:"おにぎり", reading:"おにぎり"},
+    {cat:"food", jp:"味噌汁", reading:"みそしる"},
+    {cat:"food", jp:"刺身", reading:"さしみ"},
+    {cat:"food", jp:"たこ焼き", reading:"たこやき"},
+    {cat:"food", jp:"抹茶", reading:"まっちゃ"},
+    {cat:"food", jp:"アイスクリーム", reading:"あいすくりーむ"},
+    // daily
+    {cat:"daily", jp:"傘", reading:"かさ"},
+    {cat:"daily", jp:"眼鏡", reading:"めがね"},
+    {cat:"daily", jp:"財布", reading:"さいふ"},
+    {cat:"daily", jp:"時計", reading:"とけい"},
+    {cat:"daily", jp:"携帯電話", reading:"けいたいでんわ"},
+    {cat:"daily", jp:"鏡", reading:"かがみ"},
+    {cat:"daily", jp:"布団", reading:"ふとん"},
+    {cat:"daily", jp:"歯ブラシ", reading:"はぶらし"},
+    {cat:"daily", jp:"冷蔵庫", reading:"れいぞうこ"},
+    {cat:"daily", jp:"洗濯機", reading:"せんたくき"},
+    {cat:"daily", jp:"自転車", reading:"じてんしゃ"},
+    {cat:"daily", jp:"電車", reading:"でんしゃ"},
+    {cat:"daily", jp:"手紙", reading:"てがみ"},
+    {cat:"daily", jp:"新聞", reading:"しんぶん"},
+    {cat:"daily", jp:"教科書", reading:"きょうかしょ"},
+    // job
+    {cat:"job", jp:"医者", reading:"いしゃ"},
+    {cat:"job", jp:"先生", reading:"せんせい"},
+    {cat:"job", jp:"警察官", reading:"けいさつかん"},
+    {cat:"job", jp:"消防士", reading:"しょうぼうし"},
+    {cat:"job", jp:"看護師", reading:"かんごし"},
+    {cat:"job", jp:"料理人", reading:"りょうりにん"},
+    {cat:"job", jp:"美容師", reading:"びようし"},
+    {cat:"job", jp:"農家", reading:"のうか"},
+    {cat:"job", jp:"歌手", reading:"かしゅ"},
+    {cat:"job", jp:"俳優", reading:"はいゆう"},
+    {cat:"job", jp:"弁護士", reading:"べんごし"},
+    {cat:"job", jp:"運転手", reading:"うんてんしゅ"},
+    {cat:"job", jp:"画家", reading:"がか"},
+    {cat:"job", jp:"記者", reading:"きしゃ"},
+    {cat:"job", jp:"会社員", reading:"かいしゃいん"},
+    // place
+    {cat:"place", jp:"空港", reading:"くうこう"},
+    {cat:"place", jp:"駅", reading:"えき"},
+    {cat:"place", jp:"病院", reading:"びょういん"},
+    {cat:"place", jp:"図書館", reading:"としょかん"},
+    {cat:"place", jp:"公園", reading:"こうえん"},
+    {cat:"place", jp:"神社", reading:"じんじゃ"},
+    {cat:"place", jp:"温泉", reading:"おんせん"},
+    {cat:"place", jp:"コンビニ", reading:"こんびに"},
+    {cat:"place", jp:"銀行", reading:"ぎんこう"},
+    {cat:"place", jp:"美術館", reading:"びじゅつかん"},
+    {cat:"place", jp:"動物園", reading:"どうぶつえん"},
+    {cat:"place", jp:"山", reading:"やま"},
+    {cat:"place", jp:"海", reading:"うみ"},
+    {cat:"place", jp:"橋", reading:"はし"},
+    {cat:"place", jp:"城", reading:"しろ"},
+    // feeling
+    {cat:"feeling", jp:"嬉しい", reading:"うれしい"},
+    {cat:"feeling", jp:"悲しい", reading:"かなしい"},
+    {cat:"feeling", jp:"眠い", reading:"ねむい"},
+    {cat:"feeling", jp:"忙しい", reading:"いそがしい"},
+    {cat:"feeling", jp:"暑い", reading:"あつい"},
+    {cat:"feeling", jp:"寒い", reading:"さむい"},
+    {cat:"feeling", jp:"美味しい", reading:"おいしい"},
+    {cat:"feeling", jp:"楽しい", reading:"たのしい"},
+    {cat:"feeling", jp:"怖い", reading:"こわい"},
+    {cat:"feeling", jp:"恥ずかしい", reading:"はずかしい"},
+    {cat:"feeling", jp:"元気", reading:"げんき"},
+    {cat:"feeling", jp:"静か", reading:"しずか"},
+    {cat:"feeling", jp:"うるさい", reading:"うるさい"},
+    {cat:"feeling", jp:"便利", reading:"べんり"},
+    {cat:"feeling", jp:"大変", reading:"たいへん"}
+  ];
+
+  var CATEGORIES = [
+    {id:"all", label:"すべて(ランダム)", icon:"🎲"},
+    {id:"animal", label:"動物", icon:"🐾"},
+    {id:"food", label:"食べ物", icon:"🍙"},
+    {id:"daily", label:"日常生活", icon:"🏠"},
+    {id:"job", label:"仕事", icon:"💼"},
+    {id:"place", label:"旅行・場所", icon:"🗺️"},
+    {id:"feeling", label:"気持ち・様子", icon:"😊"}
+  ];
+  var CAT_LABEL = {}; CATEGORIES.forEach(function(c){ CAT_LABEL[c.id] = c.label; });
+
+  var ROUND_SIZE = 10;
+  var state = {
+    category: "all",
+    deck: [],
+    index: 0,
+    startTime: 0,
+    timerId: null
+  };
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function wordsFor(catId){
+    return catId === "all" ? WORDS : WORDS.filter(function(w){ return w.cat === catId; });
+  }
+
+  function bestKey(catId){ return "jpquiz_best_" + catId; }
+  function getBest(catId){
+    try { var v = localStorage.getItem(bestKey(catId)); return v ? parseFloat(v) : null; }
+    catch(e){ return null; }
+  }
+  function setBest(catId, seconds){
+    try { localStorage.setItem(bestKey(catId), String(seconds)); } catch(e){}
+  }
+
+  function formatTime(ms){
+    var totalTenths = Math.floor(ms / 100);
+    var tenths = totalTenths % 10;
+    var totalSeconds = Math.floor(totalTenths / 10);
+    var seconds = totalSeconds % 60;
+    var minutes = Math.floor(totalSeconds / 60);
+    return minutes + ":" + (seconds < 10 ? "0" : "") + seconds + "." + tenths;
+  }
+
+  // ---------- screens ----------
+  var screens = {
+    start: document.getElementById("screen-start"),
+    game: document.getElementById("screen-game"),
+    result: document.getElementById("screen-result")
+  };
+  function show(name){
+    Object.keys(screens).forEach(function(k){ screens[k].hidden = (k !== name); });
+  }
+
+  // ---------- start screen ----------
+  var grid = document.getElementById("category-grid");
+  CATEGORIES.forEach(function(c){
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "chip";
+    btn.setAttribute("aria-pressed", String(c.id === state.category));
+    btn.innerHTML = '<span aria-hidden="true">' + c.icon + '</span><span>' + c.label + '</span>' +
+      '<span class="count">' + (c.id === "all" ? WORDS.length : wordsFor(c.id).length) + '語</span>';
+    btn.addEventListener("click", function(){
+      state.category = c.id;
+      Array.prototype.forEach.call(grid.children, function(el){
+        el.setAttribute("aria-pressed", "false");
+      });
+      btn.setAttribute("aria-pressed", "true");
+    });
+    grid.appendChild(btn);
+  });
+
+  document.getElementById("btn-start").addEventListener("click", startGame);
+  document.getElementById("btn-quit").addEventListener("click", function(){
+    stopTimer();
+    show("start");
+  });
+  document.getElementById("btn-retry").addEventListener("click", startGame);
+  document.getElementById("btn-change-category").addEventListener("click", function(){
+    show("start");
+  });
+
+  // ---------- progress dots ----------
+  var progressEl = document.getElementById("progress-dots");
+  function renderProgress(){
+    progressEl.innerHTML = "";
+    for (var i = 0; i < ROUND_SIZE; i++){
+      var dot = document.createElement("i");
+      if (i < state.index) dot.className = "done";
+      else if (i === state.index) dot.className = "current";
+      progressEl.appendChild(dot);
+    }
+  }
+
+  // ---------- timer ----------
+  var timerDisplay = document.getElementById("timer-display");
+  function startTimer(){
+    state.startTime = Date.now();
+    timerDisplay.textContent = "0:00.0";
+    state.timerId = setInterval(function(){
+      timerDisplay.textContent = formatTime(Date.now() - state.startTime);
+    }, 100);
+  }
+  function stopTimer(){
+    if (state.timerId){ clearInterval(state.timerId); state.timerId = null; }
+  }
+
+  // ---------- card rendering ----------
+  var stage = document.getElementById("stage");
+  var turnLabel = document.getElementById("turn-label");
+
+  function renderCard(animateIn){
+    var word = state.deck[state.index];
+    var card = document.createElement("div");
+    card.className = "card" + (animateIn ? " entering" : "");
+    card.innerHTML =
+      '<span class="cat-tag">' + CAT_LABEL[word.cat] + '</span>' +
+      '<div class="word">' + word.jp + '</div>' +
+      '<div class="reading">' + word.reading + '</div>' +
+      '<span class="tap-hint">タップして次へ</span>';
+    card.addEventListener("click", onCardTap);
+    stage.innerHTML = "";
+    stage.appendChild(card);
+    turnLabel.textContent = (state.index + 1) + "問目 / 全" + ROUND_SIZE + "問";
+    renderProgress();
+  }
+
+  function onCardTap(){
+    var current = stage.querySelector(".card");
+    current.removeEventListener("click", onCardTap);
+    current.classList.add("leaving");
+
+    if (state.index >= ROUND_SIZE - 1){
+      setTimeout(finishGame, 180);
+      return;
+    }
+    setTimeout(function(){
+      state.index += 1;
+      renderCard(true);
+    }, 180);
+  }
+
+  function startGame(){
+    var pool = wordsFor(state.category);
+    state.deck = shuffle(pool).slice(0, ROUND_SIZE);
+    state.index = 0;
+    show("game");
+    renderCard(false);
+    startTimer();
+  }
+
+  function finishGame(){
+    stopTimer();
+    var elapsedMs = Date.now() - state.startTime;
+    var elapsedSec = elapsedMs / 1000;
+    var prevBest = getBest(state.category);
+    var isNewBest = prevBest === null || elapsedSec < prevBest;
+    if (isNewBest) setBest(state.category, elapsedSec.toFixed(1));
+
+    document.getElementById("result-category").textContent =
+      CATEGORIES.filter(function(c){ return c.id === state.category; })[0].icon + " " +
+      CAT_LABEL[state.category];
+    document.getElementById("result-time").textContent = formatTime(elapsedMs);
+
+    var bestEl = document.getElementById("result-best");
+    if (isNewBest){
+      bestEl.innerHTML = "🎉 <b>このカテゴリーで自己ベスト更新!</b>";
+    } else {
+      bestEl.innerHTML = "自己ベスト <b>" + formatTime(prevBest * 1000) + "</b>";
+    }
+    show("result");
+  }
+
+  show("start");
+})();
+</script>
