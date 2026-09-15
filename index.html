@@ -73,6 +73,19 @@
     flex-direction:column;
     gap:18px;
   }
+  .app > #screen-game{
+    display:flex;
+    flex-direction:column;
+    flex:1;
+    min-height:0;
+  }
+  .app > #screen-result{
+    display:flex;
+    flex-direction:column;
+    flex:1;
+    min-height:0;
+    justify-content:center;
+  }
 
   /* ---------- shared bits ---------- */
   .pin{
@@ -196,7 +209,7 @@
   .chip[aria-pressed="true"] .count{ color:var(--accent-strong); }
 
   /* ---------- game screen ---------- */
-  .game{ display:flex; flex-direction:column; gap:16px; }
+  .game{ display:flex; flex-direction:column; gap:16px; flex:1; min-height:0; }
   .game-top{
     display:flex;
     align-items:center;
@@ -241,9 +254,8 @@
 
   .stage{
     position:relative;
-    height: min(70vh, 640px);
-    height: min(70dvh, 640px);
-    min-height:360px;
+    flex:1;
+    min-height:320px;
   }
   .card{
     position:absolute;
