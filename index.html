@@ -157,50 +157,34 @@
     line-height:1.45;
     font-size:0.85rem;
   }
-  .rules{
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-    background:var(--surface-soft);
-    border-radius:12px;
-    padding:8px 10px;
-  }
-  .rules div{
-    display:flex;
-    gap:6px;
-    align-items:flex-start;
-    font-size:0.78rem;
-    line-height:1.3;
-  }
-  .rules b{ color:var(--accent-strong); flex:0 0 auto; }
-
   .section-label{
-    font-size:0.8rem;
+    font-size:0.85rem;
     color:var(--ink-muted);
     letter-spacing:0.02em;
-    margin: 0 2px 4px;
+    margin: 0 2px 6px;
   }
   .chip-grid{
     display:grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap:6px;
+    grid-template-columns: 1fr;
+    gap:10px;
   }
   .chip{
     display:flex;
     align-items:center;
-    gap:6px;
+    gap:12px;
     background:var(--surface);
     border:1.5px solid var(--line);
     color:var(--ink);
-    border-radius:12px;
-    padding:7px 9px;
-    font-size:0.82rem;
+    border-radius:16px;
+    padding:16px 18px;
+    font-size:1.2rem;
     cursor:pointer;
     text-align:left;
   }
+  .chip span[aria-hidden]{ font-size:1.4rem; }
   .chip .count{
     margin-left:auto;
-    font-size:0.7rem;
+    font-size:0.9rem;
     color:var(--ink-muted);
   }
   .chip[aria-pressed="true"]{
@@ -378,13 +362,7 @@
     <div class="pin">📍 ご近所交流会 · 早押し単語ゲーム</div>
     <div class="hero" style="margin-top:12px;">
       <h1>日本語スピードクイズ</h1>
-      <p>一人がカードに出た単語を<b>ジェスチャーや説明</b>で伝え、残りのみんなが当てるゲームです。10問終えるまでのタイムを計ります。</p>
-      <div class="rules">
-        <div><b>1.</b> カテゴリーを選んでスタートすると、すぐタイマーが動き出します。</div>
-        <div><b>2.</b> 説明する人だけ画面を見て、単語と読み方を頼りに伝えます。</div>
-        <div><b>3.</b> 正解したらカードをタップ!すぐ次の単語に切り替わります。</div>
-        <div><b>4.</b> 10問終えるとタイマーが止まり、記録が出ます。</div>
-      </div>
+      <p>単語をジェスチャーで伝えて、みんなで当てよう!⏱️10問終えるまでタイム計測</p>
     </div>
 
     <div>
